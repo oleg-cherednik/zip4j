@@ -29,7 +29,7 @@ public class Zip4jvmSuite {
     public static final String passwordStr = "1";
     public static final char[] password = passwordStr.toCharArray();
     /** Clear resources */
-    public static final boolean clear = true;
+    public static final boolean clear = false;
 
     public static final long SIZE_1MB = 1024 * 1024;
 
