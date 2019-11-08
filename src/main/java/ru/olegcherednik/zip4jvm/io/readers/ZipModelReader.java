@@ -49,6 +49,9 @@ public final class ZipModelReader {
     }
 
     private Reader<CentralDirectory> getCentralDirectoryReader(Zip64 zip64, long offs, long totalEntries) {
+        if(zip64 == Zip64.NULL)
+            return new CentralDirectoryReader(offs, totalEntries, charsetCustomizer);
+
         Zip64.ExtensibleDataSector extensibleDataSector = zip64.getEndCentralDirectory().getExtensibleDataSector();
 
         if (extensibleDataSector == Zip64.ExtensibleDataSector.NULL)

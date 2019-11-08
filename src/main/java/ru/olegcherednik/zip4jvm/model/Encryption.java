@@ -13,7 +13,6 @@ import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareDecoder;
 import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareEncoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.StrongDecoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.StrongEncoder;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
@@ -41,10 +40,11 @@ public enum Encryption {
     private final CreateDecoderCentral createDecoderCentral;
 
     public static Encryption get(ExtraField extraField, GeneralPurposeFlag generalPurposeFlag) {
-        if (generalPurposeFlag.isStrongEncryption())
-            throw new Zip4jvmException("Strong encryption is not supported");
         if (!generalPurposeFlag.isEncrypted())
             return OFF;
+        if (generalPurposeFlag.isStrongEncryption())
+//            throw new Zip4jvmException("Strong encryption is not supported");
+            return STRONG;
         if (extraField.getAesExtraDataRecord() != AesExtraDataRecord.NULL)
             return AesEngine.getEncryption(extraField.getAesExtraDataRecord().getStrength());
         return generalPurposeFlag.isStrongEncryption() ? STRONG : PKWARE;
