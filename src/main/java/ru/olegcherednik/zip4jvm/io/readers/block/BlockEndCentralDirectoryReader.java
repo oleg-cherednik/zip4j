@@ -28,10 +28,10 @@ public class BlockEndCentralDirectoryReader extends EndCentralDirectoryReader {
         block.setOffs(in.getOffs());
         EndCentralDirectory endCentralDirectory = super.read(in);
 
-        if (in instanceof BlockModelReader.CentralDataInputStream) {
-            ((BlockModelReader.CentralDataInputStream)in).setDisk(endCentralDirectory.getMainDisk());
+        if (in instanceof BlockZipModelReader.CentralDataInputStream) {
+            ((BlockZipModelReader.CentralDataInputStream)in).setDisk(endCentralDirectory.getMainDisk());
             ((BaseZipDataInput)in).setFileName(in.getFileName());
-            ((BlockModelReader.CentralDataInputStream)in).setTotalDisks(endCentralDirectory.getTotalDisks());
+            ((BlockZipModelReader.CentralDataInputStream)in).setTotalDisks(endCentralDirectory.getTotalDisks());
         }
 
         block.setDisk(in.getDisk(), in.getFileName());

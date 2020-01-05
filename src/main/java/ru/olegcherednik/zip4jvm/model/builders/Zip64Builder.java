@@ -43,7 +43,7 @@ public final class Zip64Builder {
         endCentralDirectory.setTotalEntries(zipModel.getTotalEntries());
         endCentralDirectory.setCentralDirectorySize(zipModel.getCentralDirectorySize());
         endCentralDirectory.setCentralDirectoryOffs(zipModel.getCentralDirectoryOffs());
-        endCentralDirectory.setExtensibleDataSector(extensibleDataSector);
+//        endCentralDirectory.setExtensibleDataSector(extensibleDataSector);
         return endCentralDirectory;
     }
 

@@ -7,7 +7,9 @@ import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
 import ru.olegcherednik.zip4jvm.io.readers.BaseZipModelReader;
 import ru.olegcherednik.zip4jvm.io.readers.CentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.EndCentralDirectoryReader;
+import ru.olegcherednik.zip4jvm.io.readers.SecureCentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.Zip64Reader;
+import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
@@ -27,13 +29,13 @@ import java.util.function.Function;
  * @author Oleg Cherednik
  * @since 19.10.2019
  */
-public final class BlockModelReader extends BaseZipModelReader {
+public final class BlockZipModelReader extends BaseZipModelReader {
 
     private final Block endCentralDirectoryBlock = new Block();
     private final Zip64Block zip64Block = new Zip64Block();
     private final CentralDirectoryBlock centralDirectoryBlock = new CentralDirectoryBlock();
 
-    public BlockModelReader(Path zip, Function<Charset, Charset> customizeCharset) {
+    public BlockZipModelReader(Path zip, Function<Charset, Charset> customizeCharset) {
         super(zip, customizeCharset);
     }
 
@@ -80,7 +82,11 @@ public final class BlockModelReader extends BaseZipModelReader {
 
     @Override
     protected CentralDirectoryReader getCentralDirectoryReader(long totalEntries) {
-        return new BlockCentralDirectoryReader(totalEntries, customizeCharset, centralDirectoryBlock);
+        Zip64.ExtensibleDataSector extensibleDataSector = zip64.getEndCentralDirectory().getExtensibleDataSector();
+
+        if (extensibleDataSector == Zip64.ExtensibleDataSector.NULL)
+            return new BlockCentralDirectoryReader(totalEntries, customizeCharset, centralDirectoryBlock);
+        return new SecureCentralDirectoryReader(totalEntries, customizeCharset, extensibleDataSector);
     }
 
     @Getter

@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.engine;
 
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.io.readers.block.BlockModelReader;
+import ru.olegcherednik.zip4jvm.io.readers.block.BlockZipModelReader;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.view.decompose.CentralDirectoryDecompose;
@@ -45,7 +45,7 @@ public final class InfoEngine {
     }
 
     private BlockModel createModel() throws IOException {
-        BlockModelReader reader = new BlockModelReader(zip, settings.getCustomizeCharset());
+        BlockZipModelReader reader = new BlockZipModelReader(zip, settings.getCustomizeCharset());
         return settings.isReadEntries() ? reader.readWithEntries() : reader.read();
     }
 

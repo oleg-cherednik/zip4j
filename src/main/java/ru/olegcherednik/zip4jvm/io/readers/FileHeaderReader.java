@@ -25,14 +25,14 @@ import static ru.olegcherednik.zip4jvm.model.ExternalFileAttributes.PROP_OS_NAME
 @RequiredArgsConstructor
 public class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader>> {
 
-    private final long totalEntries;
+    private final long total;
     private final Function<Charset, Charset> customizeCharset;
 
     @Override
     public final List<CentralDirectory.FileHeader> read(DataInput in) throws IOException {
         List<CentralDirectory.FileHeader> fileHeaders = new LinkedList<>();
 
-        for (int i = 0; i < totalEntries; i++) {
+        for (int i = 0; i < total; i++) {
             checkSignature(in);
             fileHeaders.add(readFileHeader(in));
         }
