@@ -3,7 +3,7 @@ package ru.olegcherednik.zip4jvm.model;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.out.DataOutput;
+import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 
 import java.io.IOException;
 

@@ -1,9 +1,8 @@
 package ru.olegcherednik.zip4jvm.io.in.entry;
 
-import ru.olegcherednik.zip4jvm.crypto.Decoder;
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import org.apache.commons.io.IOUtils;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -19,8 +18,8 @@ final class InflateEntryInputStream extends EntryInputStream {
     private final byte[] buf = new byte[1024 * 4];
     private final Inflater inflater = new Inflater(true);
 
-    public InflateEntryInputStream(ZipEntry zipEntry, DataInput in, Decoder decoder) {
-        super(zipEntry, in, decoder);
+    public InflateEntryInputStream(ZipEntry zipEntry, DataInput in) throws IOException {
+        super(zipEntry, in);
     }
 
     @Override
@@ -61,7 +60,6 @@ final class InflateEntryInputStream extends EntryInputStream {
         if (len == IOUtils.EOF)
             throw new EOFException("Unexpected end of ZLIB input stream");
 
-        decoder.decrypt(buf, 0, len);
         readCompressedBytes += len;
         inflater.setInput(buf, 0, len);
     }

@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -145,41 +146,28 @@ public class ZipInfoTest {
         Path path = Paths.get("d:/zip4jvm/tmp/aes.zip");
 //        Files.deleteIfExists(path);
 
-//        Function<String, ZipEntrySettings> entrySettingsProvider =
-//                fileName -> ZipEntrySettings.builder()
-//                                            .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-//                                            .encryption(Encryption.AES_256, "1".toCharArray())
-//                                            .build();
-//        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(entrySettingsProvider).comment("password: 1").build();
-//        ZipIt.zip(path).settings(settings).add(contentDirSrc);
-//        ZipIt.zip(path).settings(settings).add(fileDucati);
-
-//        ZipInfo.zip(zipDeflateSolidPkware).getShortInfo();
-//        ZipInfo.zip(Paths.get("d:/zip4jvm/foo/deflate/solid/off/src.zip"))
-//        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/pkware.zip"));
-//        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/ferdinand.zip"));
-//        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/foo/store/solid/pkware/src.zip"));
-//        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/aes.zip"));
-//        ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/split/src.zip"))
-//        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/macos_10.zip"));
-//        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/ubuntu_18.zip"));
-//        ZipInfo.zip(Paths.get("d:/zip4jvm/securezip/aes128.zip"))
-//        ZipInfo.zip(TestData.zipStoreSolid)
-//        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/files.zip"));
-//        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/foo/store/split/pkware/src.zip"));
-        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/foo/store/split/aes/src.zip"));
-//        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/lapin/store_solid_off 2.zip"));
+//        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/lzma/lzma_16mb.zip"));
+//        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/lzma/lzma_1mb_32.zip"));
+//        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/lzma/enc/lzma-ultra.zip"));
+//        res = res.settings(ZipInfoSettings.builder().readEntries(false).build());
+//        ZipInfo res = ZipInfo.zip(sevenZipLzmaSolidZip);
+        ZipInfo res = ZipInfo.zip(Paths.get(
+                "D:\\zip4jvm\\foo\\compression\\1581674905105\\CompressionDeflateTest\\shouldCreateSingleZipWithFilesWhenDeflateCompression\\src.zip"));
+//        ZipInfo res = ZipInfo.zip(Paths.get("D:\\zip4jvm\\foo\\compression\\1581465466689\\CompressionLzmaTest\\shouldCreateSingleZipWithFilesWhenLzmaCompressionAndAesEncryption/src.zip"));
+//        ZipInfo res = ZipInfo.zip(
+//                Paths.get("D:\\zip4jvm\\foo\\encryption\\1581466463189\\EncryptionAesTest\\shouldCreateNewZipWithFolderAndAes256Encryption/src.zip"));
 
         return res;
     }
 
     @Test(enabled = false)
-    public void foo() throws IOException {
+    public void printShortInfo() throws IOException {
         zipInfo().printShortInfo(System.out);
     }
 
     @Test(enabled = false)
     public void decompose() throws IOException {
-        zipInfo().decompose(Zip4jvmSuite.subDirNameAsMethodName(rootDir));
+        zipInfo().settings(ZipInfoSettings.builder().copyPayload(true).build()).decompose(Zip4jvmSuite.subDirNameAsMethodName(rootDir));
     }
+
 }

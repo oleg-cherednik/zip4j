@@ -1,20 +1,19 @@
 package ru.olegcherednik.zip4jvm.assertj;
 
 import lombok.Getter;
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipFile;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 /**
  * @author Oleg Cherednik
@@ -53,7 +52,7 @@ abstract class ZipFileDecorator {
     public abstract InputStream getInputStream(ZipEntry entry);
 
     public String getComment() {
-        try (ZipFile zipFile = new ZipFile(zip.toFile())) {
+        try (java.util.zip.ZipFile zipFile = new java.util.zip.ZipFile(zip.toFile())) {
             return zipFile.getComment();
         } catch(Exception e) {
             throw new Zip4jvmException(e);
@@ -62,15 +61,23 @@ abstract class ZipFileDecorator {
 
     private static Map<String, ZipEntry> entries(Path path) {
         try (ZipFile zipFile = new ZipFile(path.toFile())) {
-            Map<String, ZipEntry> map = zipFile.stream().collect(Collectors.toMap(ZipEntry::getName, Function.identity()));
-            map.values().forEach(entry -> {
-                try {
-                    zipFile.getInputStream(entry).available();
-                } catch(IOException e) {
-                    throw new Zip4jvmException(e);
-                }
-            });
+            Map<String, ZipEntry> map = new HashMap<>();
+            Enumeration<ZipArchiveEntry> entries = zipFile.getEntries();
+
+            while (entries.hasMoreElements()) {
+                ZipArchiveEntry zipEntry = entries.nextElement();
+                zipFile.getRawInputStream(zipEntry);
+
+                ZipEntry entry = new ZipEntry(zipEntry.getName());
+                entry.setSize(zipEntry.getSize());
+                entry.setComment(zipEntry.getComment());
+                entry.setCompressedSize(zipEntry.getCompressedSize());
+                map.put(zipEntry.getName(), entry);
+            }
+
             return map;
+        } catch(Zip4jvmException e) {
+            throw e;
         } catch(Exception e) {
             throw new Zip4jvmException(e);
         }

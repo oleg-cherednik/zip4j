@@ -30,7 +30,7 @@ public final class CompressionMethodView extends BaseView {
             printLine(out, "  size of sliding dictionary (implosion):", generalPurposeFlag.getSlidingDictionarySize().getTitle());
             printLine(out, "  number of Shannon-Fano trees (implosion):", generalPurposeFlag.getShannonFanoTreesNumber().getTitle());
         } else if (compressionMethod == CompressionMethod.LZMA)
-            printLine(out, "  end-of-stream (EOS) marker:", generalPurposeFlag.isEosMarker() ? "yes" : "no");
+            printLine(out, "  end-of-stream (EOS) marker:", generalPurposeFlag.isLzmaEosMarker() ? "yes" : "no");
         else if (compressionMethod == CompressionMethod.DEFLATE || compressionMethod == CompressionMethod.ENHANCED_DEFLATE)
             printLine(out, "  compression sub-type (deflation):", generalPurposeFlag.getCompressionLevel().getTitle());
 

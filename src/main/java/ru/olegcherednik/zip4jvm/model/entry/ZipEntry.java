@@ -5,10 +5,13 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import ru.olegcherednik.zip4jvm.ZipFile;
+import ru.olegcherednik.zip4jvm.crypto.Decoder;
+import ru.olegcherednik.zip4jvm.crypto.Encoder;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
-import ru.olegcherednik.zip4jvm.model.Compression;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
+import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.InternalFileAttributes;
@@ -40,7 +43,7 @@ public abstract class ZipEntry {
     private final int lastModifiedTime;
     private final ExternalFileAttributes externalFileAttributes;
 
-    protected final Compression compression;
+    protected final CompressionMethod compressionMethod;
     private final CompressionLevel compressionLevel;
     protected final Encryption encryption;
     @Getter(AccessLevel.NONE)
@@ -60,6 +63,7 @@ public abstract class ZipEntry {
     private BooleanSupplier dataDescriptorAvailable = () -> false;
     private long uncompressedSize;
     private long compressedSize;
+    private boolean lzmaEosMarker = true;
 
     private String comment;
     private boolean utf8;
@@ -82,6 +86,10 @@ public abstract class ZipEntry {
 
     public InputStream getInputStream() throws IOException {
         return inputStreamSup.get(this);
+    }
+
+    public CompressionMethod getCompressionMethodForBuilder() {
+        return encryption.isAes() ? CompressionMethod.AES : compressionMethod;
     }
 
     @Override
@@ -109,6 +117,7 @@ public abstract class ZipEntry {
         ZipFile.Entry.Builder builder = ZipFile.Entry.builder()
                                                      .inputStreamSupplier(this::getInputStream)
                                                      .lastModifiedTime(lastModifiedTime)
+                                                     .uncompressedSize(uncompressedSize)
                                                      .externalFileAttributes(externalFileAttributes);
 
         if (isRegularFile())
@@ -117,6 +126,14 @@ public abstract class ZipEntry {
             builder.directoryName(fileName);
 
         return builder.build();
+    }
+
+    public Decoder createDecoder(DataInput in) throws IOException {
+        return Decoder.NULL;
+    }
+
+    public Encoder createEncoder() {
+        return Encoder.NULL;
     }
 
 }

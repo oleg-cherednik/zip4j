@@ -31,7 +31,14 @@ public class ZipEntryFileAssert extends AbstractZipEntryAssert<ZipEntryFileAsser
     public ZipEntryFileAssert hasSize(long size) {
         if (actual.getSize() == -1) {
             try (InputStream in = zipFile.getInputStream(actual)) {
-                actual.setSize(in.available());
+                byte[] buf = new byte[1024 * 4];
+                int available = 0;
+                int res;
+
+                while ((res = in.read(buf)) != IOUtils.EOF)
+                    available += res;
+
+                actual.setSize(available);
             } catch(Exception e) {
                 assertThatThrownBy(() -> {
                     throw e;

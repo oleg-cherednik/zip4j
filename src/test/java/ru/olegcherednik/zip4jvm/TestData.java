@@ -95,6 +95,11 @@ public final class TestData {
     public static final Path winRarDeflateSolidPkwareZip = Paths.get("src/test/resources/winrar/deflate_solid_pkware.zip").toAbsolutePath();
     public static final Path winRarDeflateSolidAesZip = Paths.get("src/test/resources/winrar/deflate_solid_aes.zip").toAbsolutePath();
 
+    // 7-Zip
+    public static final Path sevenZipStoreSplitZip = Paths.get("src/test/resources/seven-zip/store_split_off/src.zip.001").toAbsolutePath();
+    public static final Path sevenZipLzmaSolidZip = Paths.get("src/test/resources/seven-zip/lzma_solid_off.zip").toAbsolutePath();
+    public static final Path sevenZipLzmaSolidAesZip = Paths.get("src/test/resources/seven-zip/lzma_solid_aes.zip").toAbsolutePath();
+
     private static Path createTempDirectory(String prefix) {
         try {
             return Files.createTempDirectory(prefix);

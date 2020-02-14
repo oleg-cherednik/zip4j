@@ -1,6 +1,6 @@
 package ru.olegcherednik.zip4jvm.io.out.entry;
 
-import ru.olegcherednik.zip4jvm.io.out.DataOutput;
+import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
@@ -46,11 +46,9 @@ final class DeflateEntryOutputStream extends EntryOutputStream {
             len -= 4;
         }
 
-        if (firstBytesRead) {
-            encoder.encrypt(buf, 0, len);
+        if (firstBytesRead)
             out.write(buf, 0, len);
-        } else {
-            encoder.encrypt(buf, 2, len - 2);
+        else {
             out.write(buf, 2, len - 2);
             firstBytesRead = true;
         }

@@ -18,11 +18,15 @@ package ru.olegcherednik.zip4jvm;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import ru.olegcherednik.zip4jvm.engine.InfoEngine;
 import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 import ru.olegcherednik.zip4jvm.engine.ZipEngine;
 import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
+import ru.olegcherednik.zip4jvm.io.in.file.SrcFile;
+import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.utils.EmptyInputStream;
 import ru.olegcherednik.zip4jvm.utils.EmptyInputStreamSupplier;
@@ -34,6 +38,7 @@ import java.io.Closeable;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
@@ -54,8 +59,12 @@ public final class ZipFile {
         return new ZipEngine(zip, settings);
     }
 
-    static Reader reader(Path zip, UnzipSettings settings) throws IOException {
-        return new UnzipEngine(zip, settings);
+    static Reader reader(SrcFile srcFile, UnzipSettings settings) throws IOException {
+        return new UnzipEngine(srcFile, settings);
+    }
+
+    static Info info(SrcFile srcFile, ZipInfoSettings settings) throws IOException {
+        return new InfoEngine(srcFile, settings);
     }
 
     @Getter
@@ -66,6 +75,7 @@ public final class ZipFile {
         /** Normalized file name without directory marker {@literal /} */
         private final String fileName;
         private final long lastModifiedTime;
+        private final long uncompressedSize;
         private final ExternalFileAttributes externalFileAttributes;
         private final boolean regularFile;
 
@@ -76,6 +86,7 @@ public final class ZipFile {
 
             if (Files.isRegularFile(path)) {
                 builder.fileName(fileName);
+                builder.uncompressedSize(Files.size(path));
                 builder.inputStreamSupplier(() -> new FileInputStream(path.toFile()));
             } else
                 builder.directoryName(fileName);
@@ -91,6 +102,7 @@ public final class ZipFile {
             fileName = ZipUtils.normalizeFileName(builder.fileName);
             inputStreamSupplier = builder.regularFile ? builder.inputStreamSupplier : () -> EmptyInputStream.INSTANCE;
             lastModifiedTime = builder.lastModifiedTime;
+            uncompressedSize = builder.uncompressedSize;
             externalFileAttributes = builder.externalFileAttributes;
             regularFile = builder.regularFile;
         }
@@ -105,6 +117,7 @@ public final class ZipFile {
             private InputStreamSupplier inputStreamSupplier = EmptyInputStreamSupplier.INSTANCE;
             private String fileName;
             private long lastModifiedTime = System.currentTimeMillis();
+            private long uncompressedSize;
             private ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.NULL;
             private boolean regularFile = true;
 
@@ -131,6 +144,11 @@ public final class ZipFile {
 
             public Entry.Builder lastModifiedTime(long lastModifiedTime) {
                 this.lastModifiedTime = lastModifiedTime;
+                return this;
+            }
+
+            public Entry.Builder uncompressedSize(long uncompressedSize) {
+                this.uncompressedSize = uncompressedSize;
                 return this;
             }
 
@@ -176,6 +194,15 @@ public final class ZipFile {
         boolean isSplit();
 
         boolean isZip64();
+    }
+
+    public interface Info {
+
+        void printTextInfo(PrintStream out) throws IOException;
+
+        void decompose(Path dir) throws IOException;
+
+        CentralDirectory.FileHeader getFileHeader(String entryName) throws IOException;
     }
 
 }

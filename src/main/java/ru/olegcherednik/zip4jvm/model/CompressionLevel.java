@@ -15,8 +15,8 @@ import lombok.RequiredArgsConstructor;
 public enum CompressionLevel {
     SUPER_FAST(1, "superfast"),
     FAST(3, "fast"),
-    NORMAL(5, "normal"),
-    MAXIMUM(7, "maximum");
+    NORMAL(6, "normal"),
+    MAXIMUM(9, "maximum");
 
     private final int code;
     private final String title;

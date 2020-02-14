@@ -17,6 +17,7 @@ import java.util.Collection;
 import static ru.olegcherednik.zip4jvm.TestData.dirCars;
 import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileDucati;
+import static ru.olegcherednik.zip4jvm.TestData.fileEmpty;
 import static ru.olegcherednik.zip4jvm.TestData.fileHonda;
 import static ru.olegcherednik.zip4jvm.TestData.fileKawasaki;
 import static ru.olegcherednik.zip4jvm.TestData.fileSaintPetersburg;
@@ -75,11 +76,13 @@ public class ZipItSnippet {
             zipFile.add(ZipFile.Entry.builder()
                                      .inputStreamSupplier(() -> new FileInputStream(fileBentley.toFile()))
                                      .fileName("my_cars/bentley-continental.jpg")
+                                     .uncompressedSize(Files.size(fileEmpty))
                                      .lastModifiedTime(System.currentTimeMillis()).build());
 
             zipFile.add(ZipFile.Entry.builder()
                                      .inputStreamSupplier(() -> new FileInputStream(fileKawasaki.toFile()))
                                      .fileName("my_bikes/kawasaki.jpg")
+                                     .uncompressedSize(Files.size(fileKawasaki))
                                      .lastModifiedTime(System.currentTimeMillis()).build());
         }
     }

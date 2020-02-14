@@ -25,7 +25,7 @@ final class AesExtraDataRecordBuilder {
                                   .vendor("AE")
                                   .versionNumber(2)
                                   .strength(strength)
-                                  .compressionMethod(entry.getCompression().getMethod()).build();
+                                  .compressionMethod(entry.getCompressionMethod()).build();
     }
 
 }

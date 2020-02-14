@@ -34,7 +34,7 @@ final class Utils {
     }
 
     public static void copyLarge(ZipModel zipModel, Path out, long offs, long size) throws IOException {
-        Path file = zipModel.getFile();
+        Path file = zipModel.getSrcFile().getPath();
 
         try (FileInputStream fis = new FileInputStream(file.toFile()); FileOutputStream fos = new FileOutputStream(out.toFile())) {
             fis.skip(offs);

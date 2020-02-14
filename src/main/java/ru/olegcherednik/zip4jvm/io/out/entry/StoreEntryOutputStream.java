@@ -1,6 +1,6 @@
 package ru.olegcherednik.zip4jvm.io.out.entry;
 
-import ru.olegcherednik.zip4jvm.io.out.DataOutput;
+import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
@@ -18,7 +18,6 @@ final class StoreEntryOutputStream extends EntryOutputStream {
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
         super.write(buf, offs, len);
-        encoder.encrypt(buf, offs, len);
         out.write(buf, offs, len);
     }
 }

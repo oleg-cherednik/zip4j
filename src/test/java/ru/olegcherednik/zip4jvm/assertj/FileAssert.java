@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -85,7 +86,9 @@ public class FileAssert extends AbstractPathAssert<FileAssert> implements IFileA
                     break;
                 if (StringUtils.equals(actual, expected) || expected.startsWith("<-- ignore_line -->"))
                     continue;
-                // <-- regexp(^\s{4}(?:[0-9A-F]{2}\s){11}[0-9A-F]{2}$) -->
+
+                actual = Optional.ofNullable(actual).orElse("");
+                expected = Optional.ofNullable(expected).orElse("");
 
                 Matcher matcher = REGEX.matcher(expected);
 

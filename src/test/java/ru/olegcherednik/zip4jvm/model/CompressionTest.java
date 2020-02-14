@@ -19,7 +19,7 @@ public class CompressionTest {
 
     public void shouldThrowExceptionWhenCompressionMethodNotSupported() {
         for (CompressionMethod method : CompressionMethod.values())
-            if (method != CompressionMethod.STORE && method != CompressionMethod.DEFLATE)
+            if (method != CompressionMethod.STORE && method != CompressionMethod.DEFLATE && method != CompressionMethod.LZMA)
                 assertThatThrownBy(() -> Compression.parseCompressionMethod(method)).isExactlyInstanceOf(EnumConstantNotPresentException.class);
     }
 }

@@ -1,6 +1,6 @@
 package ru.olegcherednik.zip4jvm.crypto;
 
-import ru.olegcherednik.zip4jvm.io.out.DataOutput;
+import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 
 import java.io.IOException;
 

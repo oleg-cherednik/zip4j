@@ -25,9 +25,11 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static ru.olegcherednik.zip4jvm.TestData.contentDirSrc;
+import static ru.olegcherednik.zip4jvm.TestData.filesDirBikes;
 import static ru.olegcherednik.zip4jvm.TestData.filesDirCars;
 import static ru.olegcherednik.zip4jvm.TestData.zipStoreSolidPkware;
 import static ru.olegcherednik.zip4jvm.TestData.zipStoreSplitPkware;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.dirBikesAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirCarsAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
@@ -130,6 +132,22 @@ public class EncryptionPkwareTest {
         UnzipIt.zip(zip).destDir(destDir).password("Shu1an@2019GTS".toCharArray()).extract();
         assertThatDirectory(destDir).exists().hasDirectories(0).hasFiles(1);
         assertThatDirectory(destDir).file("hello.txt").exists().hasSize(11).hasContent("hello,itsme");
+    }
+
+    public void shouldCreateSingleZipWithFilesWhenLzmaCompressionAndPkwareEncryption() throws IOException {
+        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
+                                                         .compression(Compression.LZMA, CompressionLevel.NORMAL)
+                                                         .encryption(Encryption.PKWARE, password)
+                                                         .lzmaEosMarker(true).build();
+        ZipSettings settings = ZipSettings.builder()
+                                          .entrySettingsProvider(fileName -> entrySettings)
+                                          .comment("password: " + passwordStr).build();
+
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+
+        ZipIt.zip(zip).settings(settings).add(filesDirBikes);
+        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
+        assertThatZipFile(zip, password).root().matches(dirBikesAssert);
     }
 
 }

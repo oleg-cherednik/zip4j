@@ -2,14 +2,13 @@ package ru.olegcherednik.zip4jvm.io.readers.block;
 
 import lombok.Getter;
 import lombok.Setter;
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.SingleZipInputStream;
+import ru.olegcherednik.zip4jvm.io.in.file.SrcFile;
 import ru.olegcherednik.zip4jvm.io.readers.BaseZipModelReader;
 import ru.olegcherednik.zip4jvm.io.readers.CentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.EndCentralDirectoryReader;
-import ru.olegcherednik.zip4jvm.io.readers.SecureCentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.Zip64Reader;
-import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
@@ -18,10 +17,8 @@ import ru.olegcherednik.zip4jvm.model.block.Zip64Block;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.file.Path;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -29,20 +26,20 @@ import java.util.function.Function;
  * @author Oleg Cherednik
  * @since 19.10.2019
  */
-public final class BlockZipModelReader extends BaseZipModelReader {
+public final class BlockModelReader extends BaseZipModelReader {
 
     private final Block endCentralDirectoryBlock = new Block();
     private final Zip64Block zip64Block = new Zip64Block();
     private final CentralDirectoryBlock centralDirectoryBlock = new CentralDirectoryBlock();
 
-    public BlockZipModelReader(Path zip, Function<Charset, Charset> customizeCharset) {
-        super(zip, customizeCharset);
+    public BlockModelReader(SrcFile srcFile, Function<Charset, Charset> customizeCharset) {
+        super(srcFile, customizeCharset);
     }
 
     public BlockModel read() throws IOException {
         readCentralData();
 
-        ZipModel zipModel = new ZipModelBuilder(zip, endCentralDirectory, zip64, centralDirectory, customizeCharset).build();
+        ZipModel zipModel = new ZipModelBuilder(srcFile, endCentralDirectory, zip64, centralDirectory, customizeCharset).build();
 
         return BlockModel.builder()
                          .zipModel(zipModel)
@@ -54,7 +51,7 @@ public final class BlockZipModelReader extends BaseZipModelReader {
     public BlockModel readWithEntries() throws IOException {
         readCentralData();
 
-        ZipModel zipModel = new ZipModelBuilder(zip, endCentralDirectory, zip64, centralDirectory, customizeCharset).build();
+        ZipModel zipModel = new ZipModelBuilder(srcFile, endCentralDirectory, zip64, centralDirectory, customizeCharset).build();
         Map<String, ZipEntryBlock> zipEntries = new BlockZipEntryReader(zipModel, customizeCharset).read();
 
         return BlockModel.builder()
@@ -66,8 +63,8 @@ public final class BlockZipModelReader extends BaseZipModelReader {
     }
 
     @Override
-    protected DataInput createDataInput(Path zip) throws FileNotFoundException {
-        return new CentralDataInputStream(zip);
+    protected DataInput createDataInput() throws IOException {
+        return new CentralDataInputStream(srcFile);
     }
 
     @Override
@@ -82,11 +79,7 @@ public final class BlockZipModelReader extends BaseZipModelReader {
 
     @Override
     protected CentralDirectoryReader getCentralDirectoryReader(long totalEntries) {
-        Zip64.ExtensibleDataSector extensibleDataSector = zip64.getEndCentralDirectory().getExtensibleDataSector();
-
-        if (extensibleDataSector == Zip64.ExtensibleDataSector.NULL)
-            return new BlockCentralDirectoryReader(totalEntries, customizeCharset, centralDirectoryBlock);
-        return new SecureCentralDirectoryReader(totalEntries, customizeCharset, extensibleDataSector);
+        return new BlockCentralDirectoryReader(totalEntries, customizeCharset, centralDirectoryBlock);
     }
 
     @Getter
@@ -94,10 +87,9 @@ public final class BlockZipModelReader extends BaseZipModelReader {
     public static final class CentralDataInputStream extends SingleZipInputStream {
 
         private long disk;
-        private long totalDisks;
 
-        public CentralDataInputStream(Path zip) throws FileNotFoundException {
-            super(zip);
+        public CentralDataInputStream(SrcFile srcFile) throws IOException {
+            super(srcFile);
         }
 
     }

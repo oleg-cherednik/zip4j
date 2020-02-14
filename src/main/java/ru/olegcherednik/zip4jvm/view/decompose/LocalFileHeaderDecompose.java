@@ -94,15 +94,15 @@ public final class LocalFileHeaderDecompose implements Decompose {
         if (zipEntry.getCompressedSize() == 0 || !settings.isCopyPayload())
             return;
 
-        long size = zipEntry.getCompressedSize();
-        long offs = diagLocalFileHeader.getContent().getOffs() + diagLocalFileHeader.getContent().getSize();
+        Block content = diagLocalFileHeader.getContent();
+        ExtraFieldBlock extraFieldBlock = diagLocalFileHeader.getExtraFieldBlock();
 
-        if (diagLocalFileHeader.getExtraFieldBlock() != null)
-            offs += diagLocalFileHeader.getExtraFieldBlock().getSize();
+        long size = zipEntry.getCompressedSize();
+        long offs = content.getOffs() + content.getSize() + extraFieldBlock.getSize();
 
         Encryption encryption = zipEntry.getEncryption();
 
-        if (encryption == Encryption.AES_128 || encryption == Encryption.AES_192 || encryption == Encryption.AES_256) {
+        if (encryption.isAes()) {
             AesEncryptionHeaderBlock block = (AesEncryptionHeaderBlock)encryptionHeaderBlock;
 
             offs += block.getSalt().getSize();

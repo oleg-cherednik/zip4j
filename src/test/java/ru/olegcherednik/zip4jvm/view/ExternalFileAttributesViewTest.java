@@ -36,7 +36,6 @@ public class ExternalFileAttributesViewTest {
     private static final int POSIX_OWNER_READ = BIT0;
     private static final int POSIX_REGULAR_FILE = BIT7;
 
-
     public void shouldRetrieveWindowsAttributesWhenWin() throws IOException {
         ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.build(() -> WIN);
         externalFileAttributes.readFrom(new byte[] { (byte)(WINDOWS_READ_ONLY | WINDOWS_SYSTEM | WINDOWS_DIRECTORY), 0x0, 0x0, 0x0 });

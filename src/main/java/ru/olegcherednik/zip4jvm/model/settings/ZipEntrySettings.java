@@ -30,6 +30,7 @@ public final class ZipEntrySettings {
     private final String comment;
     private final boolean zip64;
     private final boolean utf8;
+    private final boolean lzmaEosMarker;
 
     public static Builder builder() {
         return new Builder();
@@ -47,6 +48,7 @@ public final class ZipEntrySettings {
         comment = builder.comment;
         zip64 = builder.zip64;
         utf8 = builder.utf8;
+        lzmaEosMarker = builder.lzmaEosMarker;
     }
 
     @SuppressWarnings("MethodCanBeVariableArityMethod")
@@ -60,6 +62,7 @@ public final class ZipEntrySettings {
         private String comment;
         private boolean zip64;
         private boolean utf8 = true;
+        private boolean lzmaEosMarker = true;
 
         private Builder(ZipEntrySettings entrySettings) {
             compression = entrySettings.compression;
@@ -69,6 +72,7 @@ public final class ZipEntrySettings {
             comment = entrySettings.comment;
             zip64 = entrySettings.zip64;
             utf8 = entrySettings.utf8;
+            lzmaEosMarker = entrySettings.lzmaEosMarker;
         }
 
         public ZipEntrySettings build() {
@@ -113,6 +117,11 @@ public final class ZipEntrySettings {
 
         public ZipEntrySettings.Builder utf8(boolean utf8) {
             this.utf8 = utf8;
+            return this;
+        }
+
+        public ZipEntrySettings.Builder lzmaEosMarker(boolean lzmaEosMarker) {
+            this.lzmaEosMarker = lzmaEosMarker;
             return this;
         }
 

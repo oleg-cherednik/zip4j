@@ -3,7 +3,7 @@ package ru.olegcherednik.zip4jvm.model.os;
 import lombok.Builder;
 import lombok.Getter;
 import org.apache.commons.lang.NotImplementedException;
-import ru.olegcherednik.zip4jvm.io.out.DataOutput;
+import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 
 import java.io.IOException;

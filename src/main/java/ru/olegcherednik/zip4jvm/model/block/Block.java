@@ -4,8 +4,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang.ArrayUtils;
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.ZipDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.ZipDataInput;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.utils.function.LocalSupplier;
 
@@ -63,4 +63,8 @@ public class Block {
         this.fileName = fileName;
     }
 
+    @Override
+    public String toString() {
+        return String.format("offs: %d, size: %s, disk: %d", offs, size, disk);
+    }
 }

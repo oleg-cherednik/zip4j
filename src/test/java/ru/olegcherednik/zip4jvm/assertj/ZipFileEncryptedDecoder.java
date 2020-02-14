@@ -86,7 +86,7 @@ class ZipFileEncryptedDecoder extends ZipFileDecorator {
             }, password);
 
             if (tmp.isEmpty() || res != ExtractOperationResult.OK)
-                throw new Zip4jvmException("Cannot extract zip entry");
+                throw new Zip4jvmException("Cannot extract zip entry: " + res);
         }
 
         int size = tmp.stream().mapToInt(buf -> buf.length).sum();

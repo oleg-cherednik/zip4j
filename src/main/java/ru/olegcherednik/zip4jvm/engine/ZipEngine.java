@@ -3,9 +3,10 @@ package ru.olegcherednik.zip4jvm.engine;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.exception.EntryDuplicationException;
 import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
-import ru.olegcherednik.zip4jvm.io.out.DataOutput;
-import ru.olegcherednik.zip4jvm.io.out.SingleZipOutputStream;
-import ru.olegcherednik.zip4jvm.io.out.SplitZipOutputStream;
+import ru.olegcherednik.zip4jvm.io.in.file.SrcFile;
+import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
+import ru.olegcherednik.zip4jvm.io.out.data.SingleZipOutputStream;
+import ru.olegcherednik.zip4jvm.io.out.data.SplitZipOutputStream;
 import ru.olegcherednik.zip4jvm.io.writers.ExistedEntryWriter;
 import ru.olegcherednik.zip4jvm.io.writers.ZipFileEntryWriter;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -86,7 +87,7 @@ public final class ZipEngine implements ZipFile.Writer {
     public void copy(Path zip) throws IOException {
         requireNotNull(zip, "ZipEngine.zip");
 
-        ZipModel srcZipModel = ZipModelBuilder.read(zip);
+        ZipModel srcZipModel = ZipModelBuilder.read(SrcFile.of(zip));
 
         for (String fileName : srcZipModel.getEntryNames()) {
             if (fileNameWriter.containsKey(fileName))
@@ -118,21 +119,21 @@ public final class ZipEngine implements ZipFile.Writer {
 
     private void removeOriginalZipFiles() throws IOException {
         if (Files.exists(zip)) {
-            ZipModel zipModel = ZipModelBuilder.read(zip);
+            ZipModel zipModel = ZipModelBuilder.read(SrcFile.of(zip));
 
             for (long i = 0; i <= zipModel.getTotalDisks(); i++)
-                Files.deleteIfExists(zipModel.getPartFile(i));
+                Files.deleteIfExists(zipModel.getDiskFile(i));
         }
     }
 
     private void moveTempZipFiles() throws IOException {
         for (long i = 0; i <= tempZipModel.getTotalDisks(); i++) {
-            Path src = tempZipModel.getPartFile(i);
+            Path src = tempZipModel.getDiskFile(i);
             Path dest = zip.getParent().resolve(src.getFileName());
             Files.move(src, dest);
         }
 
-        Files.deleteIfExists(tempZipModel.getFile().getParent());
+        Files.deleteIfExists(tempZipModel.getSrcFile().getPath().getParent());
     }
 
     private static ZipModel createTempZipModel(Path zip, ZipSettings settings, Map<String, Writer> fileNameWriter) throws IOException {
@@ -140,7 +141,7 @@ public final class ZipEngine implements ZipFile.Writer {
         ZipModel tempZipModel = ZipModelBuilder.build(tempZip, settings);
 
         if (Files.exists(zip)) {
-            ZipModel zipModel = ZipModelBuilder.read(zip);
+            ZipModel zipModel = ZipModelBuilder.read(SrcFile.of(zip));
 
             if (zipModel.isSplit())
                 tempZipModel.setSplitSize(zipModel.getSplitSize());

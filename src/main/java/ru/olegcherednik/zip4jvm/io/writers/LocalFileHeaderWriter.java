@@ -1,8 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.writers;
 
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.io.out.DataOutput;
-import ru.olegcherednik.zip4jvm.model.CompressionMethod;
+import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
@@ -22,12 +21,11 @@ public final class LocalFileHeaderWriter implements Writer {
     public void write(DataOutput out) throws IOException {
         Charset charset = localFileHeader.getGeneralPurposeFlag().getCharset();
         byte[] fileName = localFileHeader.getFileName(charset);
-        CompressionMethod compressionMethod = localFileHeader.getCompressionMethod();
 
         out.writeDwordSignature(LocalFileHeader.SIGNATURE);
         out.writeWord(localFileHeader.getVersionToExtract().getData());
-        out.writeWord(localFileHeader.getGeneralPurposeFlag().getAsInt(compressionMethod));
-        out.writeWord(compressionMethod.getCode());
+        out.writeWord(localFileHeader.getGeneralPurposeFlag().getAsInt(localFileHeader.getOriginalCompressionMethod()));
+        out.writeWord(localFileHeader.getCompressionMethod().getCode());
         out.writeDword(localFileHeader.getLastModifiedTime());
         out.writeDword(localFileHeader.getCrc32());
         out.writeDword(localFileHeader.getCompressedSize());

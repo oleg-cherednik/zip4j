@@ -6,7 +6,9 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.out.SplitZipOutputStream;
+import ru.olegcherednik.zip4jvm.io.in.data.SplitZipInputStream;
+import ru.olegcherednik.zip4jvm.io.in.file.SrcFile;
+import ru.olegcherednik.zip4jvm.io.out.data.SplitZipOutputStream;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
@@ -54,7 +56,7 @@ public class SplitZipInputStreamTest {
         FileUtils.writeByteArrayToFile(zip.toFile(), new byte[] { 0x11 }, true);
         FileUtils.writeByteArrayToFile(zip.toFile(), new byte[] { 0x12, 0x13, 0x14 }, true);
 
-        ZipModel zipModel = new ZipModel(zip);
+        ZipModel zipModel = new ZipModel(SrcFile.of(zip));
         zipModel.setTotalDisks(2);
 
         try (SplitZipInputStream in = new SplitZipInputStream(zipModel, 0)) {
@@ -93,7 +95,7 @@ public class SplitZipInputStreamTest {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         FileUtils.writeStringToFile(zip.toFile(), "oleg", Charsets.UTF_8, true);
 
-        ZipModel zipModel = new ZipModel(zip);
+        ZipModel zipModel = new ZipModel(SrcFile.of(zip));
         zipModel.setTotalDisks(1);
 
         assertThatThrownBy(() -> {

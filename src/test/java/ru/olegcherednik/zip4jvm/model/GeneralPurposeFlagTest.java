@@ -140,7 +140,7 @@ public class GeneralPurposeFlagTest {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         assertThat(generalPurposeFlag.getAsInt(CompressionMethod.LZMA)).isEqualTo(0x0);
 
-        generalPurposeFlag.setEosMarker(true);
+        generalPurposeFlag.setLzmaEosMarker(true);
         assertThat(generalPurposeFlag.getAsInt(CompressionMethod.LZMA)).isEqualTo(BIT1);
     }
 

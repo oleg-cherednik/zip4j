@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.out.DataOutput;
+import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 
 import java.io.IOException;
 import java.nio.charset.Charset;

@@ -6,9 +6,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.SingleZipInputStream;
-import ru.olegcherednik.zip4jvm.io.in.SplitZipInputStream;
+import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.SingleZipInputStream;
+import ru.olegcherednik.zip4jvm.io.in.data.SplitZipInputStream;
+import ru.olegcherednik.zip4jvm.io.in.file.SrcFile;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
@@ -40,7 +42,7 @@ public final class ZipModel {
     public static final int MAX_TOTAL_DISKS = Zip64.LIMIT_WORD;
     public static final int MAX_COMMENT_SIZE = Zip64.LIMIT_WORD;
 
-    private final Path file;
+    private final SrcFile srcFile;
     private long splitSize = NO_SPLIT;
 
     private String comment;
@@ -84,6 +86,9 @@ public final class ZipModel {
     }
 
     public ZipEntry getZipEntryByFileName(String fileName) {
+        if (!fileNameEntry.containsKey(fileName))
+            throw new EntryNotFoundException(fileName);
+
         return fileNameEntry.get(fileName);
     }
 
@@ -95,12 +100,12 @@ public final class ZipModel {
         return isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(fileNameEntry.keySet());
     }
 
-    public Path getPartFile(long disk) {
-        return disk >= totalDisks ? file : getSplitFilePath(file, disk + 1);
+    public Path getDiskFile(long disk) {
+        return disk >= totalDisks ? srcFile.getPath() : getDiskFile(srcFile.getPath(), disk + 1);
     }
 
-    public static Path getSplitFilePath(Path zip, long disk) {
-        return zip.getParent().resolve(String.format("%s.z%02d", FilenameUtils.getBaseName(zip.toString()), disk));
+    public static Path getDiskFile(Path file, long disk) {
+        return file.getParent().resolve(String.format("%s.z%02d", FilenameUtils.getBaseName(file.toString()), disk));
     }
 
     public DataInput createDataInput(String fileName) throws IOException {

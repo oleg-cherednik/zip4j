@@ -2,7 +2,7 @@ package ru.olegcherednik.zip4jvm.model;
 
 import org.mockito.InOrder;
 import org.testng.annotations.Test;
-import ru.olegcherednik.zip4jvm.io.out.DataOutput;
+import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 
 import java.io.IOException;
 

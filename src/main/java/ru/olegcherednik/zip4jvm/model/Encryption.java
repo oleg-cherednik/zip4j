@@ -11,7 +11,8 @@ import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
 import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareDecoder;
 import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareEncoder;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.model.entry.RegularFileZipEntry;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
@@ -21,19 +22,31 @@ import java.util.function.Function;
  * @author Oleg Cherednik
  * @since 09.03.2019
  */
-@Getter
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum Encryption {
-    OFF(zipEntry -> Encoder.NULL, (zipEntry, in) -> Decoder.NULL, ZipEntry::getChecksum, Compression::getMethod),
-    PKWARE(PkwareEncoder::create, PkwareDecoder::create, ZipEntry::getChecksum, Compression::getMethod),
-    AES_128(AesEncoder::create, AesDecoder::create, entry -> 0L, compression -> CompressionMethod.AES),
-    AES_192(AES_128.createEncoder, AES_128.createDecoder, AES_128.checksum, AES_128.compressionMethod),
-    AES_256(AES_128.createEncoder, AES_128.createDecoder, AES_128.checksum, AES_128.compressionMethod);
+    OFF(zipEntry -> Encoder.NULL, (zipEntry, in) -> Decoder.NULL, ZipEntry::getChecksum),
+    PKWARE(PkwareEncoder::create, PkwareDecoder::create, ZipEntry::getChecksum),
+    AES_128(AesEncoder::create, AesDecoder::create, entry -> 0L),
+    AES_192(AES_128.createEncoder, AES_128.createDecoder, AES_128.checksum),
+    AES_256(AES_128.createEncoder, AES_128.createDecoder, AES_128.checksum);
 
+    @Getter
     private final Function<ZipEntry, Encoder> createEncoder;
     private final CreateDecoder createDecoder;
+    @Getter
     private final Function<ZipEntry, Long> checksum;
-    private final Function<Compression, CompressionMethod> compressionMethod;
+
+    public boolean isAes() {
+        return this == AES_128 || this == AES_192 || this == AES_256;
+    }
+
+    public Decoder createDecoder(RegularFileZipEntry zipEntry, DataInput in) throws IOException {
+        return createDecoder.apply(zipEntry, in);
+    }
+
+    public Encoder createEncoder(RegularFileZipEntry zipEntry) {
+        return createEncoder.apply(zipEntry);
+    }
 
     public static Encryption get(ExtraField extraField, GeneralPurposeFlag generalPurposeFlag) {
         if (generalPurposeFlag.isStrongEncryption())

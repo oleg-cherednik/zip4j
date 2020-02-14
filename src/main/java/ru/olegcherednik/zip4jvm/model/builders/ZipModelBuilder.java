@@ -2,9 +2,7 @@ package ru.olegcherednik.zip4jvm.model.builders;
 
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.DataInputFile;
-import ru.olegcherednik.zip4jvm.io.in.LittleEndianReadFile;
-import ru.olegcherednik.zip4jvm.io.out.SplitZipOutputStream;
+import ru.olegcherednik.zip4jvm.io.in.file.SrcFile;
 import ru.olegcherednik.zip4jvm.io.readers.ZipModelReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Charsets;
@@ -27,25 +25,25 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public final class ZipModelBuilder {
 
-    private final Path zip;
+    private final SrcFile srcFile;
     private final EndCentralDirectory endCentralDirectory;
     private final Zip64 zip64;
     private final CentralDirectory centralDirectory;
     private final Function<Charset, Charset> charsetCustomizer;
 
-    public static ZipModel read(Path zip) throws IOException {
-        return read(zip, Charsets.UNMODIFIED);
+    public static ZipModel read(SrcFile srcFile) throws IOException {
+        return read(srcFile, Charsets.UNMODIFIED);
     }
 
-    public static ZipModel read(Path zip, Function<Charset, Charset> charsetCustomizer) throws IOException {
-        return new ZipModelReader(zip, charsetCustomizer).read();
+    public static ZipModel read(SrcFile srcFile, Function<Charset, Charset> charsetCustomizer) throws IOException {
+        return new ZipModelReader(srcFile, charsetCustomizer).read();
     }
 
     public static ZipModel build(Path zip, ZipSettings settings) {
         if (Files.exists(zip))
             throw new Zip4jvmException("ZipFile '" + zip.toAbsolutePath() + "' exists");
 
-        ZipModel zipModel = new ZipModel(zip);
+        ZipModel zipModel = new ZipModel(SrcFile.of(zip));
         zipModel.setSplitSize(settings.getSplitSize());
         zipModel.setComment(settings.getComment());
         zipModel.setZip64(settings.isZip64());
@@ -54,7 +52,7 @@ public final class ZipModelBuilder {
     }
 
     public ZipModel build() throws IOException {
-        ZipModel zipModel = new ZipModel(zip);
+        ZipModel zipModel = new ZipModel(srcFile);
 
         zipModel.setZip64(zip64 != Zip64.NULL);
         zipModel.setComment(endCentralDirectory.getComment());
@@ -105,21 +103,15 @@ public final class ZipModelBuilder {
     }
 
     private static void updateSplit(ZipModel zipModel) throws IOException {
-        if (isSplit(zipModel))
+        if (zipModel.getSrcFile().isSplit())
             zipModel.setSplitSize(getSplitSize(zipModel));
-    }
-
-    private static boolean isSplit(ZipModel zipModel) throws IOException {
-        try (DataInputFile in = new LittleEndianReadFile(zipModel.getPartFile(0))) {
-            return in.readSignature() == SplitZipOutputStream.SPLIT_SIGNATURE;
-        }
     }
 
     private static long getSplitSize(ZipModel zipModel) throws IOException {
         long size = 0;
 
         for (long i = 0; i <= zipModel.getTotalDisks(); i++)
-            size = Math.max(size, Files.size(zipModel.getPartFile(i)));
+            size = Math.max(size, Files.size(zipModel.getDiskFile(i)));
 
         return size;
     }

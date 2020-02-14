@@ -73,10 +73,8 @@ public class CentralDirectory {
             return comment == null ? ArrayUtils.EMPTY_BYTE_ARRAY : comment.getBytes(charset);
         }
 
-        public Compression getCompression() {
-            if (compressionMethod == CompressionMethod.AES)
-                return Compression.parseCompressionMethod(extraField.getAesExtraDataRecord().getCompressionMethod());
-            return Compression.parseCompressionMethod(compressionMethod);
+        public CompressionMethod getOriginalCompressionMethod() {
+            return compressionMethod == CompressionMethod.AES ? extraField.getAesExtraDataRecord().getCompressionMethod() : compressionMethod;
         }
 
         public boolean isZip64() {

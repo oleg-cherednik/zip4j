@@ -19,6 +19,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
+import ru.olegcherednik.zip4jvm.io.in.file.SrcFile;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 
 import java.io.IOException;
@@ -29,11 +30,9 @@ import java.util.Collections;
 import java.util.Optional;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireDirectory;
-import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireExists;
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotBlank;
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotEmpty;
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
-import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireRegularFile;
 
 /**
  * Extract regular files and/or directories from the zip archive
@@ -45,7 +44,7 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireRegularFile;
 public final class UnzipIt {
 
     /** path to the zip file (new or existed) */
-    private final Path zip;
+    private final SrcFile srcFile;
     /** destination directory for extracted files; by default it's directory where {@link #zip} archive is located */
     private Path destDir;
     /** setting for unzip files */
@@ -59,10 +58,7 @@ public final class UnzipIt {
      */
     public static UnzipIt zip(Path zip) {
         requireNotNull(zip, "UnzipIt.zip");
-        requireExists(zip);
-        requireRegularFile(zip, "UnzipIt.zip");
-
-        return new UnzipIt(zip).destDir(zip.getParent());
+        return new UnzipIt(SrcFile.of(zip)).destDir(zip.getParent());
     }
 
     /**
@@ -112,7 +108,7 @@ public final class UnzipIt {
      * @throws IncorrectPasswordException in case of password incorrect
      */
     public void extract() throws IOException, IncorrectPasswordException {
-        new UnzipEngine(zip, settings).extract(destDir);
+        new UnzipEngine(srcFile, settings).extract(destDir);
     }
 
     /**
@@ -159,7 +155,7 @@ public final class UnzipIt {
      */
     public InputStream stream(String fileName) throws IOException {
         requireNotBlank(fileName, "UnzipIt.fileName");
-        return ZipFile.reader(zip, settings).extract(fileName).getInputStream();
+        return ZipFile.reader(srcFile, settings).extract(fileName).getInputStream();
     }
 
     /**
@@ -169,7 +165,7 @@ public final class UnzipIt {
      * @throws IOException in case of any problem with file access
      */
     public ZipFile.Reader open() throws IOException {
-        return ZipFile.reader(zip, settings);
+        return ZipFile.reader(srcFile, settings);
     }
 
 }

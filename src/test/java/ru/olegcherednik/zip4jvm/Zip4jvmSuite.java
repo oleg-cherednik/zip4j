@@ -146,9 +146,18 @@ public class Zip4jvmSuite {
     public static Path subDirNameAsRelativePathToRoot(Path rootDir, Path zipFile) {
         Path path;
 
-        if (zipFile.toAbsolutePath().toString().contains("resources"))
-            path = Paths.get("src/test/resources/winrar").toAbsolutePath().relativize(zipFile);
-        else
+        zipFile = zipFile.toAbsolutePath();
+
+        if (zipFile.toString().contains("resources")) {
+            Path parent = zipFile.getParent();
+
+            while (!"resources".equalsIgnoreCase(parent.getFileName().toString()) &&
+                    !"resources".equalsIgnoreCase(parent.getParent().getFileName().toString())) {
+                parent = parent.getParent();
+            }
+
+            path = parent.relativize(zipFile);
+        } else
             path = dirRoot.relativize(zipFile);
 
         String dirName = path.toString().replaceAll("\\\\", "_");

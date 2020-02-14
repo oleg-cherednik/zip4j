@@ -1,8 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.in.entry;
 
 import org.apache.commons.io.IOUtils;
-import ru.olegcherednik.zip4jvm.crypto.Decoder;
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
@@ -13,8 +12,8 @@ import java.io.IOException;
  */
 final class StoreEntryInputStream extends EntryInputStream {
 
-    public StoreEntryInputStream(ZipEntry zipEntry, DataInput in, Decoder decoder) {
-        super(zipEntry, in, decoder);
+    public StoreEntryInputStream(ZipEntry zipEntry, DataInput in) throws IOException {
+        super(zipEntry, in);
     }
 
     @Override
@@ -26,7 +25,6 @@ final class StoreEntryInputStream extends EntryInputStream {
         if (len == 0 || len == IOUtils.EOF)
             return IOUtils.EOF;
 
-        decoder.decrypt(buf, offs, len);
         readCompressedBytes += len;
         writtenUncompressedBytes += len;
         updateChecksum(buf, offs, len);

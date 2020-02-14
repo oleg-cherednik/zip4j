@@ -26,7 +26,7 @@ repositories {
 }
 
 group 'ru.oleg-cherednik.zip4jvm'
-version '1.0'
+version '1.2'
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
@@ -44,7 +44,6 @@ dependencies {
     implementation 'org.slf4j:slf4j-api:1.7.25'
     implementation 'ch.qos.logback:logback-core:1.2.3'
     implementation 'ch.qos.logback:logback-classic:1.2.3'
-    implementation 'commons-cli:commons-cli:1.4'
     implementation 'commons-io:commons-io:2.6'
     implementation 'commons-lang:commons-lang:2.6'
     implementation 'org.apache.commons:commons-collections4:4.3'
@@ -60,6 +59,8 @@ dependencies {
     testImplementation 'net.lingala.zip4j:zip4j:2.2.1'
     testImplementation 'de.idyl:winzipaes:1.0.1'
     testImplementation 'org.mockito:mockito-core:3.0.0'
+    testImplementation 'org.apache.commons:commons-compress:1.20'
+    testImplementation 'org.tukaani:xz:1.8'
 
     testAnnotationProcessor("org.projectlombok:lombok:1.18.8")
 }
@@ -133,5 +134,5 @@ nexus {
 
 nexusStaging {
     packageGroup 'ru.oleg-cherednik'
-    stagingProfileId 'D3835BF60F05B9'
+    stagingProfileId 'd3835bf60f05b9'
 }

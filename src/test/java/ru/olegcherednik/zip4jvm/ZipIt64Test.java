@@ -4,6 +4,7 @@ import org.apache.commons.io.IOUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import ru.olegcherednik.zip4jvm.io.in.file.SrcFile;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
@@ -125,7 +126,7 @@ public class ZipIt64Test {
                      .forEach(zipFile::add);
         }
 
-        ZipModel zipModel = ZipModelBuilder.read(zipManyEntries);
+        ZipModel zipModel = ZipModelBuilder.read(SrcFile.of(zipManyEntries));
 
         assertThatDirectory(zipManyEntries.getParent()).exists().hasDirectories(0).hasFiles(1);
         assertThat(zipModel.getEntryNames()).hasSize(ZipModel.MAX_TOTAL_ENTRIES + 1);
@@ -155,7 +156,7 @@ public class ZipIt64Test {
         ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileNam -> entrySettings).build();
         ZipIt.zip(zipHugeEntry).settings(settings).add(Arrays.asList(file, fileBentley));
 
-        ZipModel zipModel = ZipModelBuilder.read(zipHugeEntry);
+        ZipModel zipModel = ZipModelBuilder.read(SrcFile.of(zipHugeEntry));
         assertThat(zipModel.getZipEntryByFileName("file.txt").getUncompressedSize()).isEqualTo(ZipModel.MAX_ENTRY_SIZE + 1);
         assertThat(zipModel.getZipEntryByFileName(fileNameBentley).getUncompressedSize()).isEqualTo(1_395_362);
 

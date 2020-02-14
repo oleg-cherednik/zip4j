@@ -43,7 +43,7 @@ public final class EncryptionHeaderDecompose implements Decompose {
         Path subDir = Files.createDirectories(dir.resolve("encryption"));
 
         // TODO probably same with block reader
-        if (encryption == Encryption.AES_128 || encryption == Encryption.AES_192 || encryption == Encryption.AES_256) {
+        if (encryption.isAes()) {
             AesEncryptionHeaderBlock block = (AesEncryptionHeaderBlock)encryptionHeaderBlock;
             Utils.print(subDir.resolve("aes_encryption_header.txt"), out -> encryptionHeaderView().print(out));
 

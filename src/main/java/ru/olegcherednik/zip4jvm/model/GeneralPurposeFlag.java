@@ -29,7 +29,7 @@ public class GeneralPurposeFlag {
     private CompressionLevel compressionLevel = CompressionLevel.NORMAL;
     private SlidingDictionarySize slidingDictionarySize = SlidingDictionarySize.SD_4K;
     private ShannonFanoTreesNumber shannonFanoTreesNumber = ShannonFanoTreesNumber.TWO;
-    private boolean eosMarker;
+    private boolean lzmaEosMarker;
     /** {@link DataDescriptor} */
     private boolean dataDescriptorAvailable;
     private boolean strongEncryption;
@@ -44,7 +44,7 @@ public class GeneralPurposeFlag {
         compressionLevel = getCompressionLevel(data);
         slidingDictionarySize = getSlidingDictionarySize(data);
         shannonFanoTreesNumber = getShannonFanoTreesNumber(data);
-        eosMarker = BitUtils.isBitSet(data, BIT1);
+        lzmaEosMarker = BitUtils.isBitSet(data, BIT1);
         dataDescriptorAvailable = BitUtils.isBitSet(data, BIT3);
         strongEncryption = BitUtils.isBitSet(data, BIT6);
         utf8 = BitUtils.isBitSet(data, BIT11);
@@ -107,7 +107,7 @@ public class GeneralPurposeFlag {
     }
 
     private int getLzmaBits() {
-        return eosMarker ? BIT1 : 0;
+        return lzmaEosMarker ? BIT1 : 0;
     }
 
     public Charset getCharset() {

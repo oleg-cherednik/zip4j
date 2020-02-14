@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm.engine;
 import org.apache.commons.io.FilenameUtils;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.io.in.file.SrcFile;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -30,9 +31,8 @@ public final class UnzipEngine implements ZipFile.Reader {
     private final ZipModel zipModel;
     private final UnzipSettings settings;
 
-    public UnzipEngine(Path zip, UnzipSettings settings) throws IOException {
-        checkZipFile(zip);
-        zipModel = ZipModelBuilder.read(zip, settings.getCharsetCustomizer());
+    public UnzipEngine(SrcFile srcFile, UnzipSettings settings) throws IOException {
+        zipModel = ZipModelBuilder.read(srcFile, settings.getCharsetCustomizer());
         this.settings = settings;
     }
 
@@ -118,9 +118,9 @@ public final class UnzipEngine implements ZipFile.Reader {
         else {
             zipEntry.setPassword(settings.getPasswordProvider().apply(ZipUtils.getFileNameNoDirectoryMarker(zipEntry.getFileName())));
             ZipUtils.copyLarge(zipEntry.getInputStream(), getOutputStream(file));
+            setFileAttributes(file, zipEntry);
+            setFileLastModifiedTime(file, zipEntry);
         }
-        setFileAttributes(file, zipEntry);
-        setFileLastModifiedTime(file, zipEntry);
     }
 
     private static void setFileLastModifiedTime(Path path, ZipEntry zipEntry) {
@@ -141,19 +141,12 @@ public final class UnzipEngine implements ZipFile.Reader {
     private static FileOutputStream getOutputStream(Path file) throws IOException {
         Path parent = file.getParent();
 
-        if (!Files.exists(file))
+        if (!Files.exists(parent))
             Files.createDirectories(parent);
 
         Files.deleteIfExists(file);
 
         return new FileOutputStream(file.toFile());
-    }
-
-    private static void checkZipFile(Path zip) throws IOException {
-        if (!Files.exists(zip))
-            throw new FileNotFoundException("ZipFile not exists: " + zip);
-        if (!Files.isRegularFile(zip))
-            throw new IOException("ZipFile is not a regular file: " + zip);
     }
 
 }

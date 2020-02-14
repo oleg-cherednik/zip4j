@@ -25,7 +25,7 @@ public final class LocalFileHeaderBuilder {
         LocalFileHeader localFileHeader = new LocalFileHeader();
         localFileHeader.setVersionToExtract(Version.of(Version.FileSystem.MS_DOS_OS2_NT_FAT, 20));
         localFileHeader.setGeneralPurposeFlag(createGeneralPurposeFlag());
-        localFileHeader.setCompressionMethod(zipEntry.getEncryption().getCompressionMethod().apply(zipEntry.getCompression()));
+        localFileHeader.setCompressionMethod(zipEntry.getCompressionMethodForBuilder());
         localFileHeader.setLastModifiedTime(zipEntry.getLastModifiedTime());
         localFileHeader.setCrc32(getCrc32());
         localFileHeader.setCompressedSize(getSize(zipEntry.getCompressedSize()));
@@ -43,6 +43,7 @@ public final class LocalFileHeaderBuilder {
         generalPurposeFlag.setEncrypted(zipEntry.getEncryption() != Encryption.OFF);
 //        generalPurposeFlag.setStrongEncryption(entry.getEncryption() == Encryption.STRONG);
         generalPurposeFlag.setStrongEncryption(false);
+        generalPurposeFlag.setLzmaEosMarker(zipEntry.isLzmaEosMarker());
 
         return generalPurposeFlag;
     }

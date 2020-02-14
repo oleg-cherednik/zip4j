@@ -43,7 +43,7 @@ public class CompressionMethodViewTest {
     public void shouldRetrieveTwoLinesWhenLzmaMethod() throws IOException {
         for (boolean eosMarker : Arrays.asList(true, false)) {
             GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
-            generalPurposeFlag.setEosMarker(eosMarker);
+            generalPurposeFlag.setLzmaEosMarker(eosMarker);
 
             String[] lines = Zip4jvmSuite.execute(new CompressionMethodView(CompressionMethod.LZMA, generalPurposeFlag, 0, 52));
             assertThat(lines).hasSize(2);

@@ -19,4 +19,5 @@ public interface IDirectoryAssert<S extends IDirectoryAssert<S>> {
     IFileAssert<?> file(String name);
 
     S matches(Consumer<IDirectoryAssert<?>> consumer);
+
 }
