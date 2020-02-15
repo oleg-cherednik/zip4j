@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
-import org.apache.commons.codec.digest.DigestUtils;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionInfo;
@@ -8,7 +7,6 @@ import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 
@@ -21,6 +19,7 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
@@ -30,7 +29,6 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.function.Function;
 import java.util.zip.CRC32;
-import java.util.zip.Checksum;
 import java.util.zip.Inflater;
 
 /**
@@ -56,7 +54,7 @@ public final class SecureCentralDirectoryReader extends CentralDirectoryReader {
     public CentralDirectory read(DataInput in) throws IOException {
         try {
             DecryptionHeader decryptionHeader = new DecryptionHeaderReader().read(in);
-            byte[] encrypted = in.readBytes(128);
+            byte[] encrypted = in.readBytes((int)extensibleDataSector.getCompressedSize());
 
 //            LocalFileHeader localFileHeader = new LocalFileHeaderReader(0, Charsets.UNMODIFIED).read(in);
 
@@ -164,23 +162,32 @@ public final class SecureCentralDirectoryReader extends CentralDirectoryReader {
         throw new Zip4jvmException("Encryption algorithm is not supported: " + encryptionAlgorithm);
     }
 
-    private void generateMasterSessionKey(DecryptionHeader decryptionHeader) throws NoSuchAlgorithmException {
+    private void generateMasterSessionKey(DecryptionHeader decryptionHeader) throws NoSuchAlgorithmException, InvalidKeySpecException {
         if (decryptionHeader.getDecryptionInfo().getFlags() == DecryptionInfo.Flags.MASTER_KEY_3DES)
             // TODO use 3DES 3-key MASK algorithm
             return;
 
         // TODO 1. prompt user for password
-        final String password = "666";
-        byte[] buf = password.getBytes(Charsets.UTF_8);
+        String password = "1";
+        final byte[] salt = decryptionHeader.getDecryptionInfo().getEncryptedRandomData();
+        final int keyLength = decryptionHeader.getDecryptionInfo().getBitLength();
 
-        Checksum checksum = new CRC32();
-        checksum.update(buf, 0, buf.length);
-        long crc32 = checksum.getValue();
+        ByteBuffer bbuffer = ByteBuffer.allocate(salt.length + password.length());
+        bbuffer.put(salt);
+        bbuffer.put(password.getBytes());
+
+        CRC32 crc = new CRC32();
+        crc.update(bbuffer.array());
+        long ll = crc.getValue();
+
+//        PBEKeySpec keySpec = new PBEKeySpec(password, salt, 1000, keyLength);
+//        byte[] key = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1").generateSecret(keySpec).getEncoded();
+
 
         // TODO 2. calculate hash of the password
         // for algorithms that use both Salt and IV, Salt = IV
         // IV can be completely random data and placed in front of Decryption Information; otherwise IV = CRC32 + 64-bit File Size
-        String hashPassword = DigestUtils.sha1Hex(password);
+//        String hashPassword = DigestUtils.sha1Hex(password);
 
         int a = 0;
         a++;
