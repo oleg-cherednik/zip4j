@@ -6,9 +6,12 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang.ArrayUtils;
+import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
+import ru.olegcherednik.zip4jvm.crypto.strong.HashAlgorithm;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 
 import java.io.IOException;
+import java.util.Optional;
 
 /**
  * @author Oleg Cherednik
@@ -83,7 +86,7 @@ public final class Zip64 {
         // size:8 - offs of CentralDirectory in startDiskNumber
         private long centralDirectoryOffs;
         // size:n-44 - extensible data sector
-        private byte[] extensibleDataSector = ArrayUtils.EMPTY_BYTE_ARRAY;
+        private Zip64.ExtensibleDataSector extensibleDataSector = ExtensibleDataSector.NULL;
 
     }
 
@@ -212,6 +215,117 @@ public final class Zip64 {
             }
         }
 
+    }
+
+    /** see 7.3.4 */
+    @Getter
+    public static final class ExtensibleDataSector {
+
+        public static final ExtensibleDataSector NULL = builder().build();
+
+        // size:2 - compression method
+        private final CompressionMethod compressionMethod;
+        // size:8 - size of compressed data
+        private final long compressedSize;
+        // size:8 - original uncompressed file size
+        private final long uncompressedSize;
+        // size:2 - encryption algorithm
+        private final EncryptionAlgorithm encryptionAlgorithm;
+        // size:2 - encryption key length
+        private final int bitLength;
+        // size:2 - encryption flags
+        private final int flags;
+        // size:2 - hash algorithm identifier
+        private final HashAlgorithm hashAlgorithm;
+        // size:2 - length of hash data (m)
+        private final int hashLength;
+        // size:m - hash data
+        private final byte[] hashData;
+
+        public static Builder builder() {
+            return new Builder();
+        }
+
+        @Override
+        public String toString() {
+            return this == NULL ? "<null>" : super.toString();
+        }
+
+        private ExtensibleDataSector(Builder builder) {
+            compressionMethod = builder.compressionMethod;
+            compressedSize = builder.compressedSize;
+            uncompressedSize = builder.uncompressedSize;
+            encryptionAlgorithm = builder.encryptionAlgorithm;
+            bitLength = builder.bitLength;
+            flags = builder.flags;
+            hashAlgorithm = builder.hashAlgorithm;
+            hashLength = builder.hashLength;
+            hashData = builder.hashData;
+        }
+
+        @SuppressWarnings("MethodCanBeVariableArityMethod")
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static final class Builder {
+
+            private CompressionMethod compressionMethod = CompressionMethod.STORE;
+            private long compressedSize;
+            private long uncompressedSize;
+            private EncryptionAlgorithm encryptionAlgorithm = EncryptionAlgorithm.AES_256;
+            private int bitLength;
+            private int flags;
+            private HashAlgorithm hashAlgorithm = HashAlgorithm.SHA256;
+            private int hashLength;
+            private byte[] hashData;
+
+            public ExtensibleDataSector build() {
+                return new ExtensibleDataSector(this);
+            }
+
+            public Builder compressionMethod(CompressionMethod compressionMethod) {
+                this.compressionMethod = compressionMethod;
+                return this;
+            }
+
+            public Builder compressedSize(long compressedSize) {
+                this.compressedSize = compressedSize;
+                return this;
+            }
+
+            public Builder uncompressedSize(long uncompressedSize) {
+                this.uncompressedSize = uncompressedSize;
+                return this;
+            }
+
+            public Builder encryptionAlgorithm(EncryptionAlgorithm encryptionAlgorithm) {
+                this.encryptionAlgorithm = Optional.ofNullable(encryptionAlgorithm).orElse(EncryptionAlgorithm.AES_256);
+                return this;
+            }
+
+            public Builder bitLength(int bitLength) {
+                this.bitLength = bitLength;
+                return this;
+            }
+
+            public Builder flags(int flags) {
+                this.flags = flags;
+                return this;
+            }
+
+            public Builder hashAlgorithm(HashAlgorithm hashAlgorithm) {
+                this.hashAlgorithm = Optional.ofNullable(hashAlgorithm).orElse(HashAlgorithm.SHA256);
+                return this;
+            }
+
+            public Builder hashLength(int hashLength) {
+                this.hashLength = hashLength;
+                return this;
+            }
+
+            public Builder hashData(byte[] hashData) {
+                this.hashData = ArrayUtils.clone(hashData);
+                return this;
+            }
+        }
     }
 
 }
