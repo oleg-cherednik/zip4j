@@ -108,6 +108,7 @@ public final class TestData {
     public static final Path secureZipBzip2SolidZip = Paths.get("src/test/resources/secure-zip/bzip2_solid_off.zip").toAbsolutePath();
     public static final Path secureZipBzip2SolidPkwareZip = Paths.get("src/test/resources/secure-zip/bzip2_solid_pkware.zip").toAbsolutePath();
     public static final Path secureZipEnhancedDeflateSolidZip = Paths.get("src/test/resources/secure-zip/ed_solid_off.zip").toAbsolutePath();
+    public static final Path secureZipStoreSolidAesStringZip = Paths.get("src/test/resources/secure-zip/store_solid_aes_strong.zip").toAbsolutePath();
 
     private static Path createTempDirectory(String prefix) {
         try {

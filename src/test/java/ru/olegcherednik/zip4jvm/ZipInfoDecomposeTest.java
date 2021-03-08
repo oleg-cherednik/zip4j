@@ -6,13 +6,11 @@ import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 
 import java.io.IOException;
-import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatFile;
 
 /**
  * @author Oleg Cherednik
@@ -20,9 +18,9 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatFile;
  */
 @Test
 @SuppressWarnings("FieldNamingConvention")
-public class ZipInfoTest {
+public class ZipInfoDecomposeTest {
 
-    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(ZipInfoTest.class);
+    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(ZipInfoDecomposeTest.class);
 
     @BeforeClass
     public static void createDir() throws IOException {
@@ -32,72 +30,6 @@ public class ZipInfoTest {
     @AfterClass(enabled = Zip4jvmSuite.clear)
     public static void removeDir() throws IOException {
         Zip4jvmSuite.removeDir(rootDir);
-    }
-
-    public void shouldRetrieveInfoWhenStoreSolid() throws IOException {
-        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("actual.txt");
-        Files.createDirectories(file.getParent());
-
-        try (PrintStream out = new PrintStream(file.toFile())) {
-            ZipInfo.zip(TestData.zipStoreSolid).printShortInfo(out);
-        }
-
-        assertThatFile(file).matchesResourceLines("/info/store_solid.txt");
-    }
-
-    public void shouldRetrieveInfoWhenStoreSolidPkware() throws IOException {
-        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("actual.txt");
-        Files.createDirectories(file.getParent());
-
-        try (PrintStream out = new PrintStream(file.toFile())) {
-            ZipInfo.zip(TestData.zipStoreSolidPkware).printShortInfo(out);
-        }
-
-        assertThatFile(file).matchesResourceLines("/info/store_solid_pkware.txt");
-    }
-
-    public void shouldRetrieveInfoWhenStoreSolidAes() throws IOException {
-        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("actual.txt");
-        Files.createDirectories(file.getParent());
-
-        try (PrintStream out = new PrintStream(file.toFile())) {
-            ZipInfo.zip(TestData.zipStoreSolidAes).printShortInfo(out);
-        }
-
-        assertThatFile(file).matchesResourceLines("/info/store_solid_aes.txt");
-    }
-
-    public void shouldRetrieveInfoWhenStoreSplit() throws IOException {
-        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("actual.txt");
-        Files.createDirectories(file.getParent());
-
-        try (PrintStream out = new PrintStream(file.toFile())) {
-            ZipInfo.zip(TestData.zipStoreSplit).printShortInfo(out);
-        }
-
-        assertThatFile(file).matchesResourceLines("/info/store_split.txt");
-    }
-
-    public void shouldRetrieveInfoWhenStoreSplitPkware() throws IOException {
-        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("actual.txt");
-        Files.createDirectories(file.getParent());
-
-        try (PrintStream out = new PrintStream(file.toFile())) {
-            ZipInfo.zip(TestData.zipStoreSplitPkware).printShortInfo(out);
-        }
-
-        assertThatFile(file).matchesResourceLines("/info/store_split_pkware.txt");
-    }
-
-    public void shouldRetrieveInfoWhenStoreSplitAes() throws IOException {
-        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("actual.txt");
-        Files.createDirectories(file.getParent());
-
-        try (PrintStream out = new PrintStream(file.toFile())) {
-            ZipInfo.zip(TestData.zipStoreSplitAes).printShortInfo(out);
-        }
-
-        assertThatFile(file).matchesResourceLines("/info/store_split_aes.txt");
     }
 
     public void shouldDecomposeWhenStoreSolid() throws IOException {
@@ -154,7 +86,8 @@ public class ZipInfoTest {
 //        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/3des/3des_store_168.zip"));
 //        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/bzip2/bzip2.zip"));
 //        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/bzip2/min.zip"));
-        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/ZIpCrypto/src.zip"));
+//        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/ZIpCrypto/src.zip"));
+        ZipInfo res = ZipInfo.zip(Paths.get("d:/Programming/GitHub/zip4jvm/src/test/resources/secure-zip/store_solid_aes_strong.zip"));
 
 //        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/securezip/aes/aes128.zip"));
 //        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/securezip/aes/aes192.zip"));
@@ -164,12 +97,6 @@ public class ZipInfoTest {
 //                Paths.get("D:\\zip4jvm\\foo\\encryption\\1581466463189\\EncryptionAesTest\\shouldCreateNewZipWithFolderAndAes256Encryption/src.zip"));
 
         return res;
-    }
-
-    @Test(enabled = false)
-    public void printShortInfo() throws IOException {
-        ZipInfoSettings settings = ZipInfoSettings.builder().copyPayload(true).build();
-        zipInfo().settings(settings).printShortInfo(System.out);
     }
 
     @Test(enabled = false)
