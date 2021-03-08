@@ -75,10 +75,10 @@ public class FileAssert extends AbstractPathAssert<FileAssert> implements IFileA
     public FileAssert matchesResourceLines(String path) {
         try (BufferedReader actualReader = new BufferedReader(new FileReader(actual.toFile()));
              BufferedReader expectedReader = new BufferedReader(new InputStreamReader(FileAssert.class.getResourceAsStream(path)))) {
-            int pos = 0;
+            int line = 0;
 
             while (true) {
-                pos++;
+                line++;
                 String actual = actualReader.readLine();
                 String expected = expectedReader.readLine();
 
@@ -99,9 +99,9 @@ public class FileAssert extends AbstractPathAssert<FileAssert> implements IFileA
 
                     throw new AssertionError(
                             String.format("(line %d)\r\nExpecting:\r\n<\"%s\">\r\nto be match the pattern:\r\n<\"%s\">\r\nbut was not.",
-                                    pos, actual, regex));
+                                    line, actual, regex));
                 } else
-                    assertThatStringLine(this.actual, pos, actual).isEqualTo(expected);
+                    assertThatStringLine(this.actual, line, actual).isEqualTo(expected);
             }
         } catch(Exception e) {
             assertThatThrownBy(() -> {

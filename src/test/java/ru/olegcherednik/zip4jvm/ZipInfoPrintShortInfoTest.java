@@ -93,7 +93,7 @@ public class ZipInfoPrintShortInfoTest {
         Files.createDirectories(file.getParent());
 
         try (PrintStream out = new PrintStream(file.toFile())) {
-            ZipInfo.zip(TestData.zipStoreSplitAes).printShortInfo();
+            ZipInfo.zip(TestData.zipStoreSplitAes).printShortInfo(out);
         }
 
         assertThatFile(file).matchesResourceLines("/info/store_split_aes.txt");
@@ -104,10 +104,21 @@ public class ZipInfoPrintShortInfoTest {
         Files.createDirectories(file.getParent());
 
         try (PrintStream out = new PrintStream(file.toFile())) {
-            ZipInfo.zip(TestData.secureZipStoreSolidAesStringZip).printShortInfo(out);
+            ZipInfo.zip(TestData.secureZipStoreSolidAesStrongZip).printShortInfo(out);
         }
 
-        assertThatFile(file).matchesResourceLines("/info/store_solid_aes_strong.txt");
+        assertThatFile(file).matchesResourceLines("/info/strong/store_solid_aes.txt");
+    }
+
+    public void shouldRetrieveInfoWhenStoreSplitAesStrong() throws IOException {
+        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("actual.txt");
+        Files.createDirectories(file.getParent());
+
+        try (PrintStream out = new PrintStream(file.toFile())) {
+            ZipInfo.zip(TestData.secureZipStoreSplitAesStrongZip).printShortInfo(out);
+        }
+
+        assertThatFile(file).matchesResourceLines("/info/strong/store_split_aes.txt");
     }
 
     private static ZipInfo zipInfo() {
