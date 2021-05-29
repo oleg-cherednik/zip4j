@@ -1,11 +1,45 @@
 language: java
-install: true
-
+#install: true
 dist: trusty
-jdk: openjdk8
 
-script:
-  - ./gradlew build --stacktrace
-  - ./gradlew jacocoTestReport
-after_success:
-  - bash <(curl -s https://codecov.io/bash)
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+
+cache:
+  bundler: true
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+    - $HOME/.android/build-cache
+
+jobs:
+  include:
+    - language: java
+      jdk: openjdk8
+      script:
+        - ./gradlew clean build test jacocoTestReport
+      after_success:
+        - bash <(curl -s https://codecov.io/bash)
+    - language: java
+      jdk: openjdk11
+      script:
+        - ./gradlew clean build test jacocoTestReport
+        - sonar-scanner
+      addons:
+        sonarcloud:
+          organization: oleg-cherednik
+          token:
+            secure: uDdQYyLVorXKgQ7H2pykTCkCJntON0CyBATNgZyYSa3HOwPVHcuUo4eJ+2Xhb+Wy9IkuA65L8ekWDrhcbwfL6VahSEtqJE3BzX5A0/5AHwkwgeve4ncFOJOUdTZIxShONcJnXNUYSoiI9L1Jttka4+aViRKBc9z77iY9KrnwHoBAv9VjfqkCb/PTpcHX6oLINDh2Opk0kqyfqhCbrKHyMt2UseAFh90GY4R8NRDgMC7QFuoxkRrKIi69ffsYb9vkWlvSHO3KX3roVQM/w8h0MlKOSyTk9SzeUWGGq6wI8N1CabptGvDrNzAtHIitEbtYEFlOytmPApgURMDUOkC9+wjBrfEkxNVyelK4DLqk6fpuHOmFA/7iuNMgS43APiQIMWEflhvpkIIghdrGZOrnojpt2ovkbvwntG5aiSxn4lrFB841tmrXH8h2uwejumsx10+21BjeHDg1OYy47FnhlGgOVttaVCvLTAxcNRMa7HtDaLXva9lVBeaL3EIEntUxZD2fvp7TwiButtkHDT5u5Vg3ScVAAz+wbB0fGxHwB7yV4q3wAdEq0q8RLBcO0N84R7XAfgWvhFQGi3S3A3vh6s3F4nZc8ET9mbtUJqG7aG942Vq9mOdSs63jSVMLuvlH9+KV3D6vMQgM+dplELNgzqzsHVPKQPurGdEVvmfDqaI=
+    - language: android
+      android:
+        components:
+          - android-18
+      script:
+        - ./gradlew clean build test
+    - language: android
+      android:
+        components:
+          - android-30
+      script:
+        - ./gradlew clean build test
